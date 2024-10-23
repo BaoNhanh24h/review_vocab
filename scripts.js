@@ -25,6 +25,7 @@ document.getElementById('uploadExcel').addEventListener('change', function(event
                 <td>${vietnameseMeaning}</td>
                 <td><input type="text" class="inputKorean" placeholder="Nhập câu trả lời"></td>
                 <td class="result"></td>
+                <td class="keyInfo"></td> <!-- Thêm cột để hiển thị thông tin phím -->
             `;
             tbody.appendChild(newRow);
         });
@@ -33,7 +34,8 @@ document.getElementById('uploadExcel').addEventListener('change', function(event
         const inputFields = document.querySelectorAll('.inputKorean');
         inputFields.forEach(inputField => {
             inputField.addEventListener('keydown', function(event) {
-                console.log(event.key); // In ra phím nhấn vào console
+                const keyInfoCell = inputField.closest('tr').querySelector('.keyInfo');
+                keyInfoCell.textContent = `Phím nhấn: ${event.key}`; // Hiển thị thông tin phím nhấn
 
                 // Kiểm tra nếu phím nhấn là Enter hoặc ArrowRight
                 if (event.key === 'Enter' || event.key === 'ArrowRight') {
@@ -50,14 +52,11 @@ document.getElementById('uploadExcel').addEventListener('change', function(event
 // Hàm kiểm tra câu trả lời
 function checkAnswers() {
     const rows = document.querySelectorAll('#vocabularyTable tbody tr');
-    console.log("Checking answers..."); // In ra thông báo khi hàm được gọi
 
     rows.forEach(row => {
         const koreanWord = row.querySelector('.koreanWord').textContent.trim();
         const inputKorean = row.querySelector('.inputKorean').value.trim();
         const resultCell = row.querySelector('.result');
-
-        console.log(`Korean Word: ${koreanWord}, Input: ${inputKorean}`); // In ra giá trị để kiểm tra
 
         // Kiểm tra câu trả lời và hiển thị kết quả
         if (inputKorean === koreanWord) {
