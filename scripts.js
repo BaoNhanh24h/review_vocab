@@ -28,14 +28,20 @@ document.getElementById('uploadExcel').addEventListener('change', function(event
             `;
             tbody.appendChild(newRow);
         });
+
+        // Thêm sự kiện cho các ô nhập liệu
+        const inputFields = document.querySelectorAll('.inputKorean');
+        inputFields.forEach(inputField => {
+            inputField.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' || event.key === 'ArrowRight') { // Dùng Enter hoặc ArrowRight
+                    checkAnswers(); // Kiểm tra câu trả lời
+                    inputField.blur(); // Bỏ chọn ô nhập liệu
+                }
+            });
+        });
     };
 
     reader.readAsArrayBuffer(file);
-});
-
-// Thêm sự kiện cho nút "Tiếp"
-document.getElementById('checkButton').addEventListener('click', function() {
-    checkAnswers();
 });
 
 function checkAnswers() {
@@ -47,11 +53,11 @@ function checkAnswers() {
         const resultCell = row.querySelector('.result');
 
         if (inputKorean === koreanWord) {
-            resultCell.textContent = '✔';
+            resultCell.textContent = '✔';  // Hiển thị ✔ nếu đúng
             resultCell.classList.add('correct');
             resultCell.classList.remove('incorrect');
         } else {
-            resultCell.textContent = '✘';
+            resultCell.textContent = '✘';  // Hiển thị ✘ nếu sai
             resultCell.classList.add('incorrect');
             resultCell.classList.remove('correct');
         }
