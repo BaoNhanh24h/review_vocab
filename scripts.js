@@ -28,21 +28,12 @@ document.getElementById('uploadExcel').addEventListener('change', function(event
             `;
             tbody.appendChild(newRow);
         });
-
-        // Thêm sự kiện để kiểm tra khi nhấn Enter
-        const inputFields = document.querySelectorAll('.inputKorean');
-        inputFields.forEach(inputField => {
-            inputField.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    checkAnswers();
-                }
-            });
-        });
     };
 
     reader.readAsArrayBuffer(file);
 });
 
+// Thêm sự kiện cho nút "Tiếp"
 document.getElementById('checkButton').addEventListener('click', function() {
     checkAnswers();
 });
