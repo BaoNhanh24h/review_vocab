@@ -3,28 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học Từ Vựng Tiếng Hàn</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Kiểm Tra Từ Vựng</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <style>
+        /* Thêm kiểu dáng cơ bản cho bảng */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-    <h1>Học Từ Vựng Tiếng Hàn</h1>
-    <input type="file" id="uploadExcel" accept=".xlsx">
-    <table id="vocabularyTable">
-        <thead>
-            <tr>
-                <th>Từ vựng (Ẩn)</th>
-                <th>Nghĩa Tiếng Việt</th>
-                <th>Nhập Từ Tiếng Hàn</th>
-                <th>Kết Quả</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Dữ liệu từ tệp Excel sẽ được điền ở đây -->
-        </tbody>
-    </table>
-    <button id="checkButton">Kiểm tra</button>
+    <input type="file" id="uploadExcel" accept=".xlsx, .xls" />
+    <div id="vocabularyContainer" style="display:none;">
+        <div id="currentWordContainer">
+            <h2 id="currentWord"></h2>
+            <input type="text" id="userInput" placeholder="Nhập câu trả lời">
+            <button id="checkButton">Kiểm Tra</button>
+            <div id="result"></div>
+        </div>
+        <button id="nextButton" style="display:none;">Tiếp</button> <!-- Nút tiếp -->
+    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-    <script src="scripts.js"></script>
+    <script>
+        let vocabulary = [];
+        let currentIndex = 0;
+
+        document.getElementById('uploadExcel').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                
+                // Chuyển đổi dữ liệu thành mảng từ vựng
+                vocabulary = json.map(row => ({
+                    korean: row[0],
+                    vietnamese: row[1]
+                }));
+
+                // Bắt đầu với từ ngẫu nhiên
+                currentIndex = Math.floor(Math.random() * vocabulary.length);
+                displayCurrentWord();
+                document.getElementById('vocabularyContainer').style.display = 'block'; // Hiển thị vùng từ vựng
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
+
+        document.getElementById('checkButton').addEventListener('click', function() {
+            checkAnswer(); // Kiểm tra câu trả lời khi nhấn nút
+        });
+
+        document.getElementById('nextButton').addEventListener('click', function() {
+            // Chọn từ ngẫu nhiên tiếp theo
+            currentIndex = Math.floor(Math.random() * vocabulary.length);
+            displayCurrentWord();
+            document.getElementById('nextButton').style.display = 'none'; // Ẩn nút tiếp
+        });
+
+        function displayCurrentWord() {
+            // Hiển thị từ hiện tại
+            const currentWordData = vocabulary[currentIndex];
+            document.getElementById('currentWord').textContent = currentWordData.korean;
+            document.getElementById('userInput').value = '';
+            document.getElementById('result').textContent = '';
+        }
+
+        function checkAnswer() {
+            const currentWordData = vocabulary[currentIndex];
+            const userInput = document.getElementById('userInput').value.trim();
+            const resultCell = document.getElementById('result');
+
+            // Kiểm tra câu trả lời
+            if (userInput === currentWordData.korean) {
+                resultCell.textContent = '✔ Đúng!';
+                resultCell.classList.add('correct');
+                resultCell.classList.remove('incorrect');
+                document.getElementById('nextButton').style.display = 'block'; // Hiện nút tiếp
+            } else {
+                resultCell.textContent = `✘ Sai! Đáp án đúng là: ${currentWordData.korean}`;
+                resultCell.classList.add('incorrect');
+                resultCell.classList.remove('correct');
+                document.getElementById('nextButton').style.display = 'block'; // Hiện nút tiếp
+            }
+        }
+    </script>
 </body>
 </html>
