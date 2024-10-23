@@ -38,7 +38,7 @@
 
     <script>
         let vocabulary = [];
-        let currentIndex = 0;
+        let currentIndex = -1; // Khởi tạo chỉ số từ
 
         document.getElementById('uploadExcel').addEventListener('change', function(event) {
             const file = event.target.files[0];
@@ -57,8 +57,8 @@
                     vietnamese: row[1]
                 }));
 
-                // Bắt đầu với từ ngẫu nhiên
-                currentIndex = Math.floor(Math.random() * vocabulary.length);
+                // Bắt đầu với từ đầu tiên
+                currentIndex = 0;
                 displayCurrentWord();
                 document.getElementById('vocabularyContainer').style.display = 'block'; // Hiển thị vùng từ vựng
             };
@@ -71,10 +71,16 @@
         });
 
         document.getElementById('nextButton').addEventListener('click', function() {
-            // Chọn từ ngẫu nhiên tiếp theo
-            currentIndex = Math.floor(Math.random() * vocabulary.length);
-            displayCurrentWord();
-            document.getElementById('nextButton').style.display = 'none'; // Ẩn nút tiếp
+            // Chuyển sang từ tiếp theo
+            currentIndex++;
+            if (currentIndex < vocabulary.length) {
+                displayCurrentWord();
+                document.getElementById('nextButton').style.display = 'none'; // Ẩn nút tiếp
+            } else {
+                // Nếu đã hết từ vựng
+                document.getElementById('currentWordContainer').innerHTML = '<h2>Đã hết từ vựng!</h2>';
+                document.getElementById('nextButton').style.display = 'none'; // Ẩn nút tiếp
+            }
         });
 
         function displayCurrentWord() {
@@ -83,6 +89,7 @@
             document.getElementById('currentWord').textContent = currentWordData.korean;
             document.getElementById('userInput').value = '';
             document.getElementById('result').textContent = '';
+            document.getElementById('nextButton').style.display = 'none'; // Ẩn nút tiếp khi hiển thị từ mới
         }
 
         function checkAnswer() {
